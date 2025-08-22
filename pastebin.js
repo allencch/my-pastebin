@@ -5,6 +5,7 @@ const store = {}; // in-memory storage
 
 const server = http.createServer((req, res) => {
   if (req.method === "POST" && req.url === "/paste") {
+    console.log('data coming...')
     let body = "";
     req.on("data", chunk => {
       body += chunk;
