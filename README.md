@@ -6,7 +6,7 @@ Run
 node pastebin.js
 ```
 
-Run `ngrok`.
+Run `ngrok`, eg `ngrok http 8000`
 
 Then in some other environment, to send plain text:
 
