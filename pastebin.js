@@ -7,6 +7,29 @@ const { URLSearchParams } = require('url');
 const store = {};
 
 /**
+ * Parses multipart/form-data from a request body.
+ * This is a basic implementation to extract the "content" field.
+ * @param {string} body The raw request body string.
+ * @param {string} boundary The boundary string from the Content-Type header.
+ * @returns {string | null} The value of the "content" field, or null if not found.
+ */
+function parseMultipartFormData(body, boundary) {
+  // Split the body by the boundary string
+  const parts = body.split(`--${boundary}`);
+  // Find the part that contains the "content" field
+  for (const part of parts) {
+    if (part.includes('name="content"')) {
+      // Split the part by newlines to get the header and content
+      const lines = part.split('\r\n');
+      // The content is the last non-empty line
+      const content = lines[lines.length - 2];
+      return content.trim();
+    }
+  }
+  return null;
+}
+
+/**
  * Handles incoming POST requests to create a new paste.
  * @param {http.IncomingMessage} req The request object.
  * @param {http.ServerResponse} res The response object.
@@ -48,7 +71,23 @@ function handlePostRequest(req, res) {
         res.writeHead(400, { "Content-Type": "application/json" });
         return res.end(JSON.stringify({ error: "Invalid form data. Expected a 'content' key." }));
       }
+    } else if (contentType && contentType.includes("multipart/form-data")) {
+      const boundaryMatch = /boundary=([^\s;]+)/.exec(contentType);
+      if (boundaryMatch) {
+        const boundary = boundaryMatch[1];
+        const content = parseMultipartFormData(body, boundary);
+        if (content) {
+          contentToStore = content;
+        } else {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          return res.end(JSON.stringify({ error: "Invalid multipart/form-data. Expected a 'content' field." }));
+        }
+      } else {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        return res.end(JSON.stringify({ error: "Invalid multipart/form-data. Missing boundary." }));
+      }
     }
+
 
     // Generate a short ID and store the content.
     const id = randomUUID().slice(0, 8);

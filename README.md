@@ -21,10 +21,16 @@ curl -X POST -H "Content-Type: application/json" -d '{"content": "This is my JSO
 
 ```
 
-To send form-urlencoded data:
+To send `form-urlencoded data`:
 
 ```
 curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d 'content=This+is+my+form+data.' https://<NGROK_URL>/paste
+```
+
+To send `multipart/form-data`:
+
+```
+curl -X POST -H "Content-Type: multipart/form-data" -F "content=This is my multipart data." https://<NGROK_URL>/paste
 ```
 
 You will get,
