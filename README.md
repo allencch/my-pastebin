@@ -8,10 +8,17 @@ node pastebin.js
 
 Run `ngrok`.
 
-Then in some other environment,
+Then in some other environment, to send plain text:
 
 ```
 echo "hello world" | curl -X POST --data-binary @- https://<NGROK_URL>/paste
+```
+
+To send JSON data:
+
+```
+curl -X POST -H "Content-Type: application/json" -d '{"content": "This is my JSON data."}' https://<NGROK_URL>/paste
+
 ```
 
 You will get,
