@@ -21,6 +21,12 @@ curl -X POST -H "Content-Type: application/json" -d '{"content": "This is my JSO
 
 ```
 
+To send form-urlencoded data:
+
+```
+curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d 'content=This+is+my+form+data.' https://<NGROK_URL>/paste
+```
+
 You will get,
 
 ```

@@ -1,5 +1,6 @@
 const http = require("http");
 const { randomUUID } = require("crypto");
+const { URLSearchParams } = require('url');
 
 // In-memory storage for pasted content.
 // This is a simple solution and will be cleared on server restart.
@@ -37,6 +38,16 @@ function handlePostRequest(req, res) {
         res.writeHead(400, { "Content-Type": "application/json" });
         return res.end(JSON.stringify({ error: "Failed to parse JSON body." }));
       }
+    } else if (contentType && contentType.includes("application/x-www-form-urlencoded")) {
+      // Use URLSearchParams to parse form data
+      const params = new URLSearchParams(body);
+      if (params.has('content')) {
+        contentToStore = params.get('content');
+      } else {
+        // Handle the case where the 'content' key is missing
+        res.writeHead(400, { "Content-Type": "application/json" });
+        return res.end(JSON.stringify({ error: "Invalid form data. Expected a 'content' key." }));
+      }
     }
 
     // Generate a short ID and store the content.
@@ -46,7 +57,7 @@ function handlePostRequest(req, res) {
     console.log(`New paste created with ID: ${id}`);
     res.writeHead(200, { "Content-Type": "application/json" });
     return res.end(JSON.stringify({ url: `/paste/${id}` }));
-  });  
+  });
 }
 
 /**
